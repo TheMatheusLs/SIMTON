@@ -1,0 +1,7 @@
+.vscode/
+.ipynb_checkpoints/
+.settings/
+reports/
+notebooks/
+bin/
+*class
