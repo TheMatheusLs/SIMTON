@@ -42,7 +42,7 @@ public class RunnerPSR {
 	public static void main(final String[] args) throws InvalidNumberOfFrequencySlotsException, InvalidRoutesException, InvalidNodeIdException, InvalidListOfCoefficientsException, IOException, InvalidFiberLengthException, Exception {
 		
         // *** Parâmetros da simulação ***
-		final int NETWORKLOAD = 380; 			// Carga usada para simular a rede
+		final int NETWORKLOAD = 350; 			// Carga usada para simular a rede
 		final int NUMBER_OF_SIMULATIONS = 1; 	// Número de simulação para cada carga. É tirada uma média
 		final int NUMBER_REQUEST_MAX = 100000;  // Números da rede
 		final int KYEN = 30;
@@ -56,8 +56,8 @@ public class RunnerPSR {
 
         //PSO
         final PSOType PSO_TYPE = PSOType.LOCAL_BEST;    // Regra de comunicação entre as particulas
-        final int PSO_NUMBER_OF_PARTICLES =  20;         // Número de particulas do PSO
-	    final int PSO_NUMBER_OF_INTERATIONS = 50;        // Número de interações
+        final int PSO_NUMBER_OF_PARTICLES =  30;         // Número de particulas do PSO
+	    final int PSO_NUMBER_OF_INTERATIONS = 200;        // Número de interações
 	    final boolean PSO_SIDESTEP = false;             //
         final ParticlePSOType PSO_PARTICLE_TYPE = ParticlePSOType.PSR_METRIC;
         final double[] PSO_COEFF_SEED = {};
@@ -104,9 +104,12 @@ public class RunnerPSR {
 		routingInstance.OrderConflictRoutes();
 
 		System.out.println("Inicializando as partículas.......%n");
+
+        //final double[] objetive = {0.5, -0.5, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, -0.2}; // {0.0,0.0,0.0};
 		
         // Como queremos encontrar o menor fitness, iniciamos todas as partículas com o maior valor possível
-        GenericSwarm swarmPSO = new GenericSwarm(PSO_NUMBER_OF_PARTICLES, Double.MAX_VALUE, termN * termN, PSO_TYPE, -1, 1);
+        GenericSwarm swarmPSO = new GenericSwarm(PSO_NUMBER_OF_PARTICLES, Double.MAX_VALUE, termN * termN * termN, PSO_TYPE, -1, 1);
+        //GenericSwarm swarmPSO = new GenericSwarm(PSO_NUMBER_OF_PARTICLES, Double.MAX_VALUE, objetive.length, PSO_TYPE, -1, 1);
         // Basta trocar 'termN * termN' pelo número de termos que a partícula do PSO deve ter
 
         // Armazena os melhores coeficientes para cada interação
@@ -122,7 +125,8 @@ public class RunnerPSR {
 		//debugClass.setFolderToReadReqs("08-05-21_11-16-28_FINLANDIA_ALTERNATIVO_PSR_METRIC_OK"); // 440 Erlangs
 		//debugClass.setFolderToReadReqs("09-05-21_10-01-58_NSFNET_14_ALTERNATIVO_YEN_OK"); // 440 Erlangs Nsftnet
 
-        debugClass.setFolderToReadReqs("11-05-21_09-58-33_FINLANDIA_ALTERNATIVO_YEN_OK"); // 380 Erlangs 320 slots
+        debugClass.setFolderToReadReqs("12-05-21_21-34-03_FINLANDIA_ALTERNATIVO_DANILO_OK"); // 350 Erlangs 320 slots
+        //debugClass.setFolderToReadReqs("14-05-21_19-34-51_FINLANDIA_ALTERNATIVO_PSR_METRIC_OK"); // 400 Erlangs 320 slots
 
         // Percorre todas as interações
 		for(int i=0;i<PSO_NUMBER_OF_INTERATIONS;i++){
@@ -139,17 +143,17 @@ public class RunnerPSR {
                 double[] coefficientsParticle = particle.getPosition();
 
                 long simParticleTimeInit = System.currentTimeMillis();
-                
-                double particleFitness = 0;
 
-                for (int s = 0;s < NUMBER_OF_SIMULATIONS; s++){
+                double particleFitness = simRMLSAInstance.simulation(network, listOfNodes, NUMBER_REQUEST_MAX, ROUTING_ALGORITHM_TYPE, NETWORKLOAD, allRoutes, coefficientsParticle, fuzzyLogicType, KYEN, debugClass);
 
-                    particleFitness += simRMLSAInstance.simulation(network, listOfNodes, NUMBER_REQUEST_MAX, ROUTING_ALGORITHM_TYPE, NETWORKLOAD, allRoutes, coefficientsParticle, fuzzyLogicType, KYEN, debugClass);
+                // double particleFitnessAux = 0;
+                // for (int p = 0; p < objetive.length; p++){
+                //     particleFitnessAux += Math.pow(objetive[p] - coefficientsParticle[p], 2);
+                // }
 
-                    NetworkTopologyInstance.resetNetworkAdjacencyMatrix();
-                }
-                particleFitness = particleFitness / NUMBER_OF_SIMULATIONS;
-                
+                // double particleFitness = Math.sqrt(particleFitnessAux);  // Math.hypot(objetive[0] - coefficientsParticle[0], objetive[1] - coefficientsParticle[1]);
+
+                NetworkTopologyInstance.resetNetworkAdjacencyMatrix();   
                 
                 long simParticleTimeEnd = System.currentTimeMillis();
 
@@ -160,12 +164,14 @@ public class RunnerPSR {
 
                 particle.setFitness(particleFitness);
 
-                if (particleFitness < particle.getpBestFitness()){
+                if (particle.getpBestFitness() > particleFitness){
                     particle.setpBestFitness(particleFitness);
+                    particle.setpBestPosition(coefficientsParticle);
+
                 }
 
                 //Atualiza a posição global caso esteja vazia
-                if (particleFitness < swarmPSO.getgBestFitness()){
+                if (swarmPSO.getgBestFitness() > particleFitness){
                     swarmPSO.setgBestFitness(particleFitness);
                     swarmPSO.setgBestPosition(coefficientsParticle);
                 }
@@ -180,16 +186,6 @@ public class RunnerPSR {
 
                 particleID++;
             }
-
-            if (PSO_TYPE == PSOType.GLOBAL_BEST){
-                swarmPSO.updateVelocityGlobal();
-            } if (PSO_TYPE == PSOType.LOCAL_BEST){
-                swarmPSO.updateVelocityLocal();
-            } else {
-                assert false;
-            }
-            assert false;
-            swarmPSO.updatePosition();
 
 		    long psoIterationFinalTime = System.currentTimeMillis();
 		    
@@ -216,6 +212,16 @@ public class RunnerPSR {
             bestPSO[i] = bestSolution;
 
             folderClass.writeFile("PSOMinMax.csv", String.format("%d,%f,%f",i, minFitnessCurrent, maxFitnessCurrent));
+
+            if (PSO_TYPE == PSOType.GLOBAL_BEST){
+                swarmPSO.updateVelocityGlobal();
+            } if (PSO_TYPE == PSOType.LOCAL_BEST){
+                swarmPSO.updateVelocityLocal();
+            } else {
+                assert false;
+            }
+            assert false;
+            swarmPSO.updatePosition();
 		}
 		
 		for (double[] coeffs: bestPSO){

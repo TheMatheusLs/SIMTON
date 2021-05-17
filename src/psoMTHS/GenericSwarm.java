@@ -31,9 +31,11 @@ public class GenericSwarm {
     private final double SIDESTEP_SCALE = 10.0;
     private final double SIDESTEP_THRES = 10.0;
 
-    private final double W = 0.5;
-    private final double C1 = 2.05;
-    private final double C2 = 2.05;
+    private final double W = 0.729844;
+    //private final double C1 = 2.05;
+    //private final double C2 = 2.05;
+    private final double C1 = 1.496180;
+    private final double C2 = 1.496180;
 
     Random rand = new Random();
 
@@ -83,24 +85,32 @@ public class GenericSwarm {
 
     public void updateVelocityGlobal(){     
         for (GenericParticle particle : this.allParticles){
+            double R1 =  this.rand.nextDouble();
+            double R2 =  this.rand.nextDouble();
             for(int i = 0; i < particle.getVelocity().length; i++){
 
-                final double temp = particle.getVelocity()[i] * W + C1 * this.rand.nextDouble() * (particle.getBestPosition()[i] - particle.getPosition()[i]) + C2 * this.rand.nextDouble() * (this.getgBestPosition()[i] - particle.getPosition()[i]); 
+                double temp1 = particle.getVelocity()[i] * W;
+                double temp2 = C1 * R1 * (particle.getBestPosition()[i] - particle.getPosition()[i]);
+                double temp3 = C2 * R2 * (this.getgBestPosition()[i] - particle.getPosition()[i]);
+
+                final double temp = temp1 + temp2 + temp3; 
+
+                //final double temp = particle.getVelocity()[i] * W + C1 * this.rand.nextDouble() * (particle.getBestPosition()[i] - particle.getPosition()[i]) + C2 * this.rand.nextDouble() * (this.getgBestPosition()[i] - particle.getPosition()[i]); 
                 
                 double velocid = temp;
 
-                if (Math.abs(particle.getBestPosition()[i] - particle.getPosition()[i]) < sidestepThresPPR 
-                && Math.abs(getgBestPosition()[i] - particle.getPosition()[i]) < sidestepThresPPR 
-                && particle.getVelocity()[i] < sidestepThresPPR
-                && this.sidestepPPR){
+                // if (Math.abs(particle.getBestPosition()[i] - particle.getPosition()[i]) < sidestepThresPPR 
+                // && Math.abs(getgBestPosition()[i] - particle.getPosition()[i]) < sidestepThresPPR 
+                // && particle.getVelocity()[i] < sidestepThresPPR
+                // && this.sidestepPPR){
                     
-                    if (temp < 0){
-                        velocid = temp - this.sidestepThresPPR * SIDESTEP_SCALE;
-                    }else{
-                        velocid = temp + this.sidestepThresPPR * SIDESTEP_SCALE;
-                        this.sidestepThresPPR = this.sidestepThresPPR / 2;
-                    }	 
-                }
+                //     if (temp < 0){
+                //         velocid = temp - this.sidestepThresPPR * SIDESTEP_SCALE;
+                //     }else{
+                //         velocid = temp + this.sidestepThresPPR * SIDESTEP_SCALE;
+                //         this.sidestepThresPPR = this.sidestepThresPPR / 2;
+                //     }	 
+                // }
                 
                 particle.setVelocity(i, velocid); 
             }		
@@ -108,7 +118,7 @@ public class GenericSwarm {
 	}
 
     public void updateVelocityLocal(){     
-        for (int indexParticle = 0; indexParticle < (this.allParticles.size() - 1); indexParticle++){
+        for (int indexParticle = 0; indexParticle < (this.allParticles.size()); indexParticle++){
             
             GenericParticle lBestLeft = this.allParticles.get( (indexParticle + this.allParticles.size() - 1) % this.allParticles.size() );
             GenericParticle lBestRight = this.allParticles.get( (indexParticle + 1) % this.allParticles.size() );
@@ -121,26 +131,35 @@ public class GenericSwarm {
             }
             GenericParticle particleCurrent = this.allParticles.get(indexParticle);
 
+            double R1 =  this.rand.nextDouble();
+            double R2 =  this.rand.nextDouble();
+
             for(int iVel=0; iVel < particleCurrent.getVelocity().length; iVel++){
 
-                final double temp = particleCurrent.getVelocity()[iVel] * W
-                        + C1 *this.rand.nextDouble()*(particleCurrent.getBestPosition()[iVel] - particleCurrent.getPosition()[iVel]) 
-                        + C2 *this.rand.nextDouble()*(lBest[iVel] - particleCurrent.getPosition()[iVel]);
+                double temp1 = particleCurrent.getVelocity()[iVel] * W;
+                double temp2 = C1 * R1 * (particleCurrent.getBestPosition()[iVel] - particleCurrent.getPosition()[iVel]);
+                double temp3 = C2 * R2 * (lBest[iVel] - particleCurrent.getPosition()[iVel]);
+
+                final double temp = temp1 + temp2 + temp3; 
+
+                //final double temp = particleCurrent.getVelocity()[iVel] * W
+                //        + C1 *this.rand.nextDouble()*(particleCurrent.getBestPosition()[iVel] - particleCurrent.getPosition()[iVel]) 
+                //        + C2 *this.rand.nextDouble()*(lBest[iVel] - particleCurrent.getPosition()[iVel]);
 
                 double velocid = temp;
 
-                if (Math.abs(particleCurrent.getBestPosition()[iVel] - particleCurrent.getPosition()[iVel]) < sidestepThresPPR 
-                && Math.abs(getgBestPosition()[iVel] - particleCurrent.getPosition()[iVel]) < sidestepThresPPR 
-                && Math.abs(particleCurrent.getVelocity()[iVel]) < sidestepThresPPR
-                && this.sidestepPPR){
+                // if (Math.abs(particleCurrent.getBestPosition()[iVel] - particleCurrent.getPosition()[iVel]) < sidestepThresPPR 
+                // && Math.abs(getgBestPosition()[iVel] - particleCurrent.getPosition()[iVel]) < sidestepThresPPR 
+                // && Math.abs(particleCurrent.getVelocity()[iVel]) < sidestepThresPPR
+                // && this.sidestepPPR){
                     
-                    if (temp < 0){
-                        velocid = temp - this.sidestepThresPPR * SIDESTEP_SCALE;
-                    }else{
-                        velocid = temp + this.sidestepThresPPR * SIDESTEP_SCALE;
-                        this.sidestepThresPPR = this.sidestepThresPPR / 2;
-                    }	 
-                }
+                //     if (temp < 0){
+                //         velocid = temp - this.sidestepThresPPR * SIDESTEP_SCALE;
+                //     }else{
+                //         velocid = temp + this.sidestepThresPPR * SIDESTEP_SCALE;
+                //         this.sidestepThresPPR = this.sidestepThresPPR / 2;
+                //     }	 
+                // }
                 
                 particleCurrent.setVelocity(iVel, velocid);
             }

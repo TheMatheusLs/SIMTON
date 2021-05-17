@@ -21,7 +21,7 @@ public class CreateFolder {
     String dateForm;
     String folderName;
     String folderPath;
-    String mainFolderName = ".\\Results\\"; // DANILO
+    String mainFolderName = "D:\\ProgrammingFiles\\ReportsSIMTON\\"; // DANILO
 
     public CreateFolder(String simulationType, String topologyType){
         this.simulationType = simulationType;

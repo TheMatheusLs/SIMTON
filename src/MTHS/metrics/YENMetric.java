@@ -28,6 +28,12 @@ public class YENMetric {
 		return metricInstance;
 	}
 
+    public double calculateCTRFragmentation(RoutingAlgorithmSolution route){
+
+        
+        return 0.0;
+    }
+
     public double calculateCTRHxB(RoutingAlgorithmSolution route, CallRequest callRequest) throws InvalidRoutesException{
 
         SimulationParameters parameters = new SimulationParameters();

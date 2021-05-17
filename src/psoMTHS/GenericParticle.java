@@ -10,8 +10,8 @@ public class GenericParticle {
     private double[] velocity;
     private final double minPosition;
     private final double maxPosition;
-    private final double MAX_VELOCITY = 0.1;
-	private final double MIN_VELOCITY = -0.1;
+    private final double MAX_VELOCITY = 0.5;
+	private final double MIN_VELOCITY = -0.5;
     private final int dimention;
     private double pBestFitness;
     private double fitness;
@@ -34,6 +34,7 @@ public class GenericParticle {
 
         for (int d = 0; d < this.dimention; d++){
             this.position[d] = randomUniformGenerator(this.minPosition, this.maxPosition);
+            //this.velocity[d] = randomUniformGenerator(0.0, 0.0); //randomUniformGenerator(MIN_VELOCITY, MAX_VELOCITY);
             this.velocity[d] = randomUniformGenerator(MIN_VELOCITY, MAX_VELOCITY);
         }
 
@@ -64,9 +65,9 @@ public class GenericParticle {
 
         this.fitness = fitness;
 
-        if (this.pBestFitness > fitness){
-            setpBestFitness(fitness);
-        }
+        // if (this.pBestFitness > fitness){
+        //     setpBestFitness(fitness);
+        // }
     }
 
     public void setpBestFitness(double pBestFitness){
@@ -94,13 +95,15 @@ public class GenericParticle {
     }
 
     public void setVelocity(int pos, double value){
-        if (value > MAX_VELOCITY){
-            this.velocity[pos] = MAX_VELOCITY;
-        } else if (value < MIN_VELOCITY ){
-            this.velocity[pos] = MIN_VELOCITY;
-        } else {
-            this.velocity[pos] = value;
-        }
+        // if (value > MAX_VELOCITY){
+        //     this.velocity[pos] = MAX_VELOCITY;
+        // } else if (value < MIN_VELOCITY ){
+        //     this.velocity[pos] = MIN_VELOCITY;
+        // } else {
+        //     this.velocity[pos] = value;
+        // }
+
+        this.velocity[pos] = value;
     }
 
     private double randomUniformGenerator(final double minimum, final double maximum){

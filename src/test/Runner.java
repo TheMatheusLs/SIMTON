@@ -41,10 +41,10 @@ public class Runner {
 	public static void main(final String[] args) throws InvalidNumberOfFrequencySlotsException, InvalidRoutesException, InvalidNodeIdException, InvalidListOfCoefficientsException, IOException, InvalidFiberLengthException, Exception {		
 		
 		// *** Parâmetros da simulação ***
-		int networkLoad = 400; 						// Carga inicial da rede (inicia pela carga mais elevada)
-		final short NUMBER_OF_SIMULATIONS = 1; 	// Número de simulação para cada carga. É tirada uma média
+		int networkLoad = 460; 						// Carga inicial da rede (inicia pela carga mais elevada)
+		final short NUMBER_OF_SIMULATIONS = 20; 	// Número de simulação para cada carga. É tirada uma média
 		final int NETWORK_LOAD_STEP = 20; 			// Passo da carga da rede
-		final short NUMBER_NETWORK_LOAD = 1; 		// Números da rede
+		final short NUMBER_NETWORK_LOAD = 12; 		// Números da rede
 		final int NUMBER_REQUEST_MAX = 100000; 		// Números da rede
  
 		final TopologyType TOPOLOGY_TYPE = TopologyType.FINLANDIA; // Topologia escolhida
@@ -53,7 +53,7 @@ public class Runner {
 		final int KYEN = 30;
 		final boolean isKYEN = false; // True testa a alocação em todas as K rotas, false só ordena e utiliza a primeira delas
 	
-		final MetricMethodType fuzzyLogicType = MetricMethodType.DANILO;
+		final MetricMethodType fuzzyLogicType = MetricMethodType.PSR_METRIC;
 
 		//double[] coefficientsMetric = {-0.0317384946595442,-0.39308554692825304,-0.3058208896150939,-0.06009584912110333,0.698109163561386,-0.3361904946613041,-0.06292627241242654,0.5548767212265256,-0.611000395689437,1.0,0.12413102230807807,0.9198481893861266,0.10640709963023998,0.007780220601598498,-0.12787550010030724,-0.35143729923613476,0.24776548236053753,0.19009535102397468,0.9804671744507242,0.5731231329930202,0.2870549313312988,0.0,-0.7911221723471716,-0.3902356782415606,0.5241476275767839,0.033124936429372975,-0.21342032735364463}; // PSR (Ocupação + Hops x Banda + Rota interferente) | Treino a 400 Erlangs | K = 3
 		//double[] coefficientsMetric = {-0.21601713329099453,0.08291569078595538,-0.057720983944591686,0.6499540885331926,-0.5698220251163655,0.24012706358024294,-1.0,0.4808387103618502,1.0,-0.31858621860363784,-0.5023616199336771,-0.5372809573772185,-0.09634997116181593,-0.7083148364442822,0.7305082581122344,0.6477601310955727,-0.8536537362534622,-0.2619521804708661,0.5492612225063196,-1.0,-0.49363784985885767,0.08622859951785253,-0.10092684236335997,-0.3433063536229435,0.5893962488429738,0.1811745964491535,0.8323562529129838}; // PSR (Ocupação + Hops x Banda) | Treino a 400 Erlangs | K = 30
@@ -63,7 +63,12 @@ public class Runner {
 		//double[] coefficientsMetric = {0.03172240424782599,-0.07895468350960595,0.3907186603903695,0.43586201352502874,0.9934532118174826,0.795025960549425,0.2543391244904636,-0.01951896051072244,-0.01134470981614119}; // PSR (Ocupação, Hops x Banda) | Treino a 380 2 Erlangs | K = 30 | lOCAL BEST
 
 		// ***** Depois de treinado o coeficiente deve ser colocado na linha abaixo *** DANILO
-		double[] coefficientsMetric = {}; // Novos coeficientes
+		//double[] coefficientsMetric = null; // Novos coeficientes
+		//double[] coefficientsMetric = {1.0,-0.2009969505502096,1.0,-0.2567625263030997,1.0,-0.4145040473050373,1.0,1.0,-1.0}; // Ocupação, hops x Banda
+		//double[] coefficientsMetric = {-0.9831553617417035,-0.9804714553747134,0.8616806807536697,1.0,0.9855427666589702,0.9831509411515779,1.0,-0.9831523955039938,-0.9988673592759575}; // Ocupação, IRotas
+		//double[] coefficientsMetric = {-1.0,0.843032977841426,1.0,0.39142351018362304,1.0,-0.2087841635604233,1.0,1.0,0.8924487254582305}; // Ocupação, hops x Banda
+		//double[] coefficientsMetric = {-1.0,-0.5955527332716818,0.8037864944870329,0.2609026920980665,-1.0,-0.96674343109799,0.7930910401231256,-0.31520061124388193,1.0,0.6560766114367439,0.9156272053511233,-0.03892058885454207,-0.3913421866935217,1.0,-0.9833941685767187,0.5783678815626098,1.0,-0.7667896561875371,-0.20738357461056445,0.15624303549240134,0.8992007939896669,1.0,-1.0,-1.0,-0.3185029368405188,-1.0,-0.26686505461794485}; // Ocupação, hops x Banda, 0
+		double[] coefficientsMetric = {0.22885420829958208,-1.0,0.17234911173405065,1.0,-0.9656927067813067,-0.78553512740841,1.0,-0.15907839084112674,-0.9481149501246433,-0.559116852040598,0.7419079373402878,0.995356902694456,-0.6527107603589984,0.15853427538648346,0.513369914715046,0.34819128503369967,-0.2662912010741523,0.5357667069026263,0.8787235052629222,0.5053944824229946,-0.3419344933967521,0.9788111057700393,1.0,0.6387770965482881,0.6574473390034087,-0.11585041173601479,-0.8813261708732077}; // Ocupação, hops x Banda, 0
 		
 
 		// Cria uma pasta para armazenar os resultados da simulação
@@ -122,7 +127,7 @@ public class Runner {
 		// Para criar um arquivo com as requisições pode ser modificado o para true o primeiro parâmetro da linha acima e comentando as linhas de debugClass abaixo.
 		// Para ler o txt de um arquivo, modifique o nome da pasta abaixo.
 
-		debugClass.setFolderToReadReqs("12-05-21_15-16-19_FINLANDIA_ALTERNATIVO_DANILO_OK"); // 400 Erlangs 320 slots
+		//debugClass.setFolderToReadReqs("12-05-21_21-34-03_FINLANDIA_ALTERNATIVO_DANILO_OK"); // 350 Erlangs 320 slots
 
 		for(int i=0;i<NUMBER_NETWORK_LOAD;i++){ //For each network load
 			

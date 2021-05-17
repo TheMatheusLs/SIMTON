@@ -133,12 +133,12 @@ public class AlgorithmRoutes {
 
 				PSRMetric PSR = PSRMetric.getPSRMetricInstance();
 
-				//PSR.calculateOHBI(route, maxHopsRoute, maxIRoutes, maxHopsxBanda, callRequest); // (Ocupação, Hops x Banda, Irotas)
-				PSR.calculateOHB(route, maxHopsRoute, maxHopsxBanda, callRequest); // (Ocupação, Hops x Banda)
+				PSR.calculateOHBI(route, maxHopsRoute, maxIRoutes, maxHopsxBanda, callRequest); // (Ocupação, Hops x Banda, Irotas)
+				//PSR.calculateOHB(route, maxHopsRoute, maxHopsxBanda, callRequest); // (Ocupação, Hops x Banda)
 				//PSR.calculateOI(route, maxIRoutes, callRequest); // (Ocupação, Irotas)
 
-				//CTR = PSR.calculateCTR3(coeffMetric, callRequest);
-				CTR = PSR.calculateCTR2(coeffMetric, callRequest);
+				CTR = PSR.calculateCTR3(coeffMetric, callRequest);
+				//CTR = PSR.calculateCTR2(coeffMetric, callRequest);
 				
 			} else if (metricType.equals(MetricMethodType.YEN)){
 				YENMetric YEN = YENMetric.getYENMetricInstance();
