@@ -5,9 +5,13 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
+import call_request.CallRequest;
 import parameters.SimulationParameters;
+import routing.RoutingAlgorithmSolution;
 import types.MetricMethodType;
 import types.ModulationLevelType;
 import types.PSOType;
@@ -42,6 +46,46 @@ public class CreateFolder {
             System.out.println("ERRO: Pasta não foi criada");  
 
         }
+    }
+
+    public void saveReqLog(ArrayList<List<RoutingAlgorithmSolution>> allRoutes, CallRequest callRequest){
+
+        try {
+
+            final SimulationParameters parameters = new SimulationParameters();
+
+            int reqID = callRequest.getReqID();
+            int reqBitRate = callRequest.getBitRate();
+            int reqSource = callRequest.getSourceId();
+            int reqDestination = callRequest.getDestinationId();
+            double reqDecayTime = callRequest.getDecayTime();
+            double reqDuration = callRequest.getDuration();
+            List<Integer> reqFreqsSlots = callRequest.getFrequencySlots();
+            int reqRouteID = callRequest.getRoute().getRouteID();
+
+            String folderTotalPath = String.format("%s\\%s\\", this.mainFolderName, this.folderName);
+
+            boolean statusFolder = new java.io.File(folderTotalPath, "ReqsLog").mkdirs();
+
+            final FileWriter file = new FileWriter(String.format("%s\\ReqsLog\\LogReqRoutes%07d.csv", folderTotalPath, reqID), true); 
+            final PrintWriter saveFile3 = new PrintWriter(file);
+
+            for (List<RoutingAlgorithmSolution> listRoutes : allRoutes){
+                if (listRoutes != null){
+                    for (RoutingAlgorithmSolution route : listRoutes){
+                        int routeID = route.getRouteID();
+                        List<Integer> routeSlots = new ArrayList<>(parameters.getNumberOfSlots());
+                        for (int s = 0; s < parameters.getNumberOfSlots();s++){
+                            routeSlots.add((int)route.getSlotValue(s));
+                        }
+                        saveFile3.printf(String.format("%d,%s%n", routeID, routeSlots.toString().replace(',','-')));
+                        //saveFile3.printf(String.format("%d", routeID));
+                    }
+                }
+            }
+
+            saveFile3.close();
+        } catch (Exception e) {}
     }
 
     public String getFolderName(){

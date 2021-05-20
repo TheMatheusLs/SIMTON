@@ -24,6 +24,7 @@ public enum MetricMethodType {
 	MSCL_APETURE(17, "Métrica para calcular o buraco com a menor perda de capacidade", "MSCL_APETURE"),
 	DANILO(18, "Métrica desenvolvida por Danilo", "DANILO"),
 	FRAGMENTATION(19, "Métrica para avaliar a fragmentação da rede", "FRAGMENTATION"),
+	MSCL_SPECTRUM(20, "MSCL para a primeira rota possível", "MSCL_SPECTRUM"),
 	//SUGENO_EON_ONE_TRI(11, "Métrica usando Hops + MForms + Forms com uma rota. Triângulo", "SUGENO_EON_ONE_TRI"),
 	//SUGENO_EON_KYEN_TRI(12, "Métrica usando Hops + MForms + Forms com K rotas. Triângulo", "SUGENO_EON_KYEN_TRI"),
 	//SUGENO_EON_ONE_TRA(13, "Métrica usando Hops + MForms + Forms com uma rota. Trápezio", "SUGENO_EON_ONE_TRA"),

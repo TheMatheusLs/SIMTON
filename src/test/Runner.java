@@ -8,6 +8,7 @@ import java.util.Vector;
 
 import arquitecture.OpticalLink;
 import arquitecture.OpticalSwitch;
+import exceptions.ExceptionsByMTHS;
 import exceptions.InvalidFiberLengthException;
 import exceptions.InvalidListOfCoefficientsException;
 import exceptions.InvalidNodeIdException;
@@ -19,6 +20,7 @@ import network_topologies.INetworkDimention;
 import network_topologies.NetworkTopology;
 import network_topologies.NsfnetDimention;
 import network_topologies.PacificBellDimention;
+import network_topologies.RingDimention;
 import network_topologies.TestDimention;
 import network_topologies.ToroidalDimention;
 import parameters.SimulationParameters;
@@ -29,6 +31,7 @@ import simulation.IRMLSASimulation;
 import simulation.RMLSASimulation;
 import types.RoutingAlgorithmType;
 import types.TopologyType;
+import types.CallRequestType;
 import types.MetricMethodType;
 import utility.Debug;
 import utility.Function;
@@ -38,22 +41,22 @@ import utility.Function;
  */
 public class Runner {
 
-	public static void main(final String[] args) throws InvalidNumberOfFrequencySlotsException, InvalidRoutesException, InvalidNodeIdException, InvalidListOfCoefficientsException, IOException, InvalidFiberLengthException, Exception {		
+	public static void main(final String[] args) throws InvalidNumberOfFrequencySlotsException, InvalidRoutesException, InvalidNodeIdException, InvalidListOfCoefficientsException, IOException, InvalidFiberLengthException, Exception, ExceptionsByMTHS {		
 		
 		// *** Parâmetros da simulação ***
-		int networkLoad = 460; 						// Carga inicial da rede (inicia pela carga mais elevada)
+		int networkLoad = 100; 						// Carga inicial da rede (inicia pela carga mais elevada)
 		final short NUMBER_OF_SIMULATIONS = 20; 	// Número de simulação para cada carga. É tirada uma média
-		final int NETWORK_LOAD_STEP = 20; 			// Passo da carga da rede
-		final short NUMBER_NETWORK_LOAD = 12; 		// Números da rede
+		final int NETWORK_LOAD_STEP = 5; 			// Passo da carga da rede
+		final short NUMBER_NETWORK_LOAD = 10; 		// Números da rede
 		final int NUMBER_REQUEST_MAX = 100000; 		// Números da rede
  
-		final TopologyType TOPOLOGY_TYPE = TopologyType.FINLANDIA; // Topologia escolhida
+		final TopologyType TOPOLOGY_TYPE = TopologyType.RING; // Topologia escolhida
 		final RoutingAlgorithmType ROUTING_ALGORITHM_TYPE = RoutingAlgorithmType.ALTERNATIVE; // Algoritmo de roteamente escolhida
 
-		final int KYEN = 30;
+		final int KYEN = 2;
 		final boolean isKYEN = false; // True testa a alocação em todas as K rotas, false só ordena e utiliza a primeira delas
 	
-		final MetricMethodType fuzzyLogicType = MetricMethodType.PSR_METRIC;
+		final MetricMethodType fuzzyLogicType = MetricMethodType.YEN;
 
 		//double[] coefficientsMetric = {-0.0317384946595442,-0.39308554692825304,-0.3058208896150939,-0.06009584912110333,0.698109163561386,-0.3361904946613041,-0.06292627241242654,0.5548767212265256,-0.611000395689437,1.0,0.12413102230807807,0.9198481893861266,0.10640709963023998,0.007780220601598498,-0.12787550010030724,-0.35143729923613476,0.24776548236053753,0.19009535102397468,0.9804671744507242,0.5731231329930202,0.2870549313312988,0.0,-0.7911221723471716,-0.3902356782415606,0.5241476275767839,0.033124936429372975,-0.21342032735364463}; // PSR (Ocupação + Hops x Banda + Rota interferente) | Treino a 400 Erlangs | K = 3
 		//double[] coefficientsMetric = {-0.21601713329099453,0.08291569078595538,-0.057720983944591686,0.6499540885331926,-0.5698220251163655,0.24012706358024294,-1.0,0.4808387103618502,1.0,-0.31858621860363784,-0.5023616199336771,-0.5372809573772185,-0.09634997116181593,-0.7083148364442822,0.7305082581122344,0.6477601310955727,-0.8536537362534622,-0.2619521804708661,0.5492612225063196,-1.0,-0.49363784985885767,0.08622859951785253,-0.10092684236335997,-0.3433063536229435,0.5893962488429738,0.1811745964491535,0.8323562529129838}; // PSR (Ocupação + Hops x Banda) | Treino a 400 Erlangs | K = 30
@@ -93,6 +96,8 @@ public class Runner {
             NetworkDimentionInstance = new FinlandNewDimention();
         } else if (TopologyType.TOROIDAL == TOPOLOGY_TYPE){
             NetworkDimentionInstance = new ToroidalDimention();
+        } else if (TopologyType.RING == TOPOLOGY_TYPE){
+            NetworkDimentionInstance = new RingDimention();
         }
 		// Teste de topologia
 		//NetworkDimentionInstance = new TestDimention();
@@ -106,11 +111,18 @@ public class Runner {
 
 		final IRMLSASimulation simRMLSAInstance = RMLSASimulation.getRMLSASimulationInstance();
 		
+		SimulationParameters parameters = new SimulationParameters();
+
 		System.out.println("Criando todas as rotas para os pares origem destino!");
 		Routing routingInstance = new Routing(network, listOfNodes, ROUTING_ALGORITHM_TYPE, KYEN);
 		ArrayList<List<RoutingAlgorithmSolution>> allRoutes = routingInstance.getAllRoutes();
-		routingInstance.findAllModulationsByRoute();
-		routingInstance.generateConflictList();
+		//routingInstance.findAllModulationsByRoute();
+		routingInstance.findAllSizeSlotsAndModulationByRoute();
+		if (parameters.getCallRequestType().equals(CallRequestType.BIDIRECTIONAL)){
+			routingInstance.generateConflictListBidirectional();
+		} else {
+			routingInstance.generateConflictList();
+		}
 		routingInstance.OrderConflictRoutes();
 
 		Function function = new Function();
@@ -120,7 +132,6 @@ public class Runner {
 		Vector<Double> simulationTime = new Vector<Double>();
 		Vector<Double> partialThroughput = new Vector<Double>();
 
-		SimulationParameters parameters = new SimulationParameters();
 
 		// Cria a estrutura para armazenar as informações de debug
 		Debug debugClass = new Debug(false, folderClass, isKYEN);
@@ -128,6 +139,9 @@ public class Runner {
 		// Para ler o txt de um arquivo, modifique o nome da pasta abaixo.
 
 		//debugClass.setFolderToReadReqs("12-05-21_21-34-03_FINLANDIA_ALTERNATIVO_DANILO_OK"); // 350 Erlangs 320 slots
+		//debugClass.setFolderToReadReqs("18-05-21_13-59-40_FINLANDIA_ALTERNATIVO_YEN_OK"); // 50 Erlangs 64 slots FINLANDIA
+		//debugClass.setFolderToReadReqs("20-05-21_07-42-10_RING_ALTERNATIVO_YEN_OK"); // 50 Erlangs 64 slots RING
+		//debugClass.setFolderToReadReqs("20-05-21_07-46-12_RING_ALTERNATIVO_YEN_OK"); // 70 Erlangs 64 slots RING
 
 		for(int i=0;i<NUMBER_NETWORK_LOAD;i++){ //For each network load
 			

@@ -53,7 +53,7 @@ public class SimulationParameters {
 	 * N�mero de canais na rede.
 	 * @author Andr� 
 	 */
-	private static final int NUMBER_SLOTS = 320;
+	private static final int NUMBER_SLOTS = 64;
 	//Span parameters
 	/**
 	 * Tamanho do span.
@@ -92,8 +92,8 @@ public class SimulationParameters {
 	 * Lista de Taxas de transmiss�o consideradas na simula��o.
 	 * @author Andr� 
 	 */
-	private static final int[] BIT_RATE = {40,100,150,200,400}; //in Gb/s //Removi a taxa de 10 Gbits
-	//private static final int[] BIT_RATE = {20,50,75,100,200}; //in Gb/s //Removi a taxa de 10 Gbits
+	//private static final int[] BIT_RATE = {40,100,150,200,400}; //in Gb/s //Removi a taxa de 10 Gbits
+	private static final int[] BIT_RATE = {50,75,100,200,300}; //in Gb/s //Removi a taxa de 10 Gbits
 	/**
 	 * Tempo m�ximo.
 	 * @author Andr� 

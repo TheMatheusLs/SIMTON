@@ -10,6 +10,7 @@ public enum TopologyType {
 	FINLANDIA (2, "FINLANDIA"),
 	FINLANDIA_NEW (3, "FINLANDIA_NEW"),
 	ATTMPLS (4, "ATTMPLS"),
+	RING (5, "RING"),
 	TOROIDAL (5, "TOROIDAL");
 	
 	private int code; // Código do algoritmo da Topologia

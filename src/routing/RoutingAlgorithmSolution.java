@@ -33,6 +33,8 @@ public class RoutingAlgorithmSolution {
 
 	private short[] slotOcupation;
 	private List<ModulationLevelType> modulationsTypeByBitrate;
+	private List<Integer> sizeSlotsbyBitrate;
+	private List<Integer> slotsByMSCL = null;
 
 	public RoutingAlgorithmSolution() {		
 		this.upLink = new ArrayList<OpticalLink>();
@@ -147,7 +149,6 @@ public class RoutingAlgorithmSolution {
 		this.slotOcupation = new short[parameters.getNumberOfSlots()];
 	}
 
-
 	public void incrementSlotsOcupy(List<Integer> slots){
 
 		for (int s: slots){
@@ -191,8 +192,24 @@ public class RoutingAlgorithmSolution {
 	public void setModulationsTypeByBitrate(List<ModulationLevelType> modulationsTypeByBitrate){
 		this.modulationsTypeByBitrate = modulationsTypeByBitrate;
 	}
+
+	public void setSizeSlotTypeByBitrate(List<Integer> sizeSlotsbyBitrate){
+		this.sizeSlotsbyBitrate = sizeSlotsbyBitrate;
+	}
 	
 	public List<ModulationLevelType> getModulationsTypeByBitrate(){
 		return this.modulationsTypeByBitrate;
+	}
+
+	public List<Integer> getSizeSlotTypeByBitrate(){
+		return this.sizeSlotsbyBitrate;
+	}
+
+	public void setSlotsByMSCL(List<Integer> slotsByMSCL){
+		this.slotsByMSCL = slotsByMSCL;
+	}
+
+	public List<Integer> getSlotsByMSCL(){
+		return this.slotsByMSCL;
 	}
 }

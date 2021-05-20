@@ -187,8 +187,8 @@ public class RMLSASimulation implements IRMLSASimulation { // NOPMD by Andr� o
 						final FuzzyAlgorithm fuzzyInstance = FuzzyAlgorithm.getFuzzyInstance();							
 						route = fuzzyInstance.findRouteKYEN(routeSolution, network, callRequest, listOfNodes, listOfCoeffs).get(debugClass.getRouteToFind());
 
-					} else if (metricLogicType.equals(MetricMethodType.ALPHA_BETA_GAMMA_ONE) || metricLogicType.equals(MetricMethodType.PSR_METRIC) || metricLogicType.equals(MetricMethodType.YEN) || metricLogicType.equals(MetricMethodType.SLOT_APERTURE) || metricLogicType.equals(MetricMethodType.MSCL_APETURE) || metricLogicType.equals(MetricMethodType.DANILO)){// //Método de Sugeno criado por Matheus usando novas regras de tabela verdade
-							
+					} else if (metricLogicType.equals(MetricMethodType.ALPHA_BETA_GAMMA_ONE) || metricLogicType.equals(MetricMethodType.PSR_METRIC) || metricLogicType.equals(MetricMethodType.YEN) || metricLogicType.equals(MetricMethodType.SLOT_APERTURE) || metricLogicType.equals(MetricMethodType.MSCL_APETURE) || metricLogicType.equals(MetricMethodType.DANILO) || metricLogicType.equals(MetricMethodType.MSCL_SPECTRUM)){// //Método de Sugeno criado por Matheus usando novas regras de tabela verdade
+						
 						final AlgorithmRoutes MTHSInstance = AlgorithmRoutes.getInstance();
 						route = MTHSInstance.sortRoutes(routeSolution, network, callRequest, listOfNodes, listOfCoeffs, metricLogicType, debugClass).get(debugClass.getRouteToFind()); //0
 					}
@@ -220,14 +220,18 @@ public class RMLSASimulation implements IRMLSASimulation { // NOPMD by Andr� o
 				final double osnrLinear = (((double)callRequest.getBitRate()*1E9)/(2*bZero))*snrLinear;
 				debugClass.setOSNRTh(osnrLinear);
 				
-				final int reqNumbOfSlots = function.calculateNumberOfSlots(callRequest.getModulationType(), callRequest);
+				final int reqNumbOfSlots = function.calculateNumberOfSlots(callRequest.getModulationType(), callRequest.getBitRate());
 				debugClass.setReqNumbOfSlots(reqNumbOfSlots);
 
 				callRequest.setRequiredNumberOfSlots(reqNumbOfSlots);
 
 				final ISpectrumAssignmentAlgorithm ffInstance = FirstFitAlgorithm.getFFInstance();
-					
-				slots = ffInstance.findFrequencySlots(parameters.getNumberOfSlots(), reqNumbOfSlots, route.getUpLink(), route.getDownLink());
+				
+				if (metricLogicType.equals(MetricMethodType.MSCL_SPECTRUM)){
+					slots = route.getSlotsByMSCL();
+				} else {
+					slots = ffInstance.findFrequencySlots(parameters.getNumberOfSlots(), reqNumbOfSlots, route.getUpLink(), route.getDownLink());
+				}
 				
 				// VALIDA OS SLOTS ENCONTRADOS
 				slots = isValidSlots(slots, route);
@@ -315,10 +319,17 @@ public class RMLSASimulation implements IRMLSASimulation { // NOPMD by Andr� o
 					dataLog = String.format("%d,%f,%d,%d,%s,%f,%f,%f,%d,%d,%s,%s,%d,%b,%f,%f,%d,%d,%b,%b,%d,%d",i,meanRateBetCall,source,destination,OD,-1.0, -1.0, time, callRequest.getBitRate(), -1, "null", slotsString, -1, reqStatus, debugClass.getOSNRTh(),debugClass.getOSNRInbond(), numCallUnacceptBer, numCallLackOfSpect, hasSlots, hasQoT, debugClass.getRouteToFind(), debugClass.getRouteKYEN());
 				}
 
-				debugClass.getCreateFolder().writeFile(debugClass.getLogReqSimulationFilename(), dataLog);
+				debugClass.getCreateFolder().writeFile(debugClass.getLogReqSimulationFilename(), dataLog);	
 			}
 
 			limitCallRequest = i;
+
+			// Armazena o registro de todo o log das requisições
+			// Escreve as requisições
+			if (debugClass.isDebugReqON()){
+				debugClass.getCreateFolder().saveReqLog(allRoutes, callRequest);
+			}
+
 
 			// Verfica se o número de erros máximo foi atingido
 			if ((numCallLackOfSpect + numCallUnacceptBer) >= 1000){
@@ -371,6 +382,10 @@ public class RMLSASimulation implements IRMLSASimulation { // NOPMD by Andr� o
 
 	public List<Integer> isValidSlots(List<Integer> slots, RoutingAlgorithmSolution route){
 		Function function = new Function();
+
+		if (slots == null){
+			return new ArrayList<Integer>();
+		}
 
 		POINT: for (int slot: slots){
 			boolean availableSlot = true;

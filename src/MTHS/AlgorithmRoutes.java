@@ -17,6 +17,7 @@ import MTHS.metrics.AlphaBetaGamma;
 import MTHS.metrics.Danilo;
 import MTHS.metrics.FormsEONMetric;
 import MTHS.metrics.MSCLApeture;
+import MTHS.metrics.MSCLSpectrum;
 import MTHS.metrics.OriginalMetric;
 import MTHS.metrics.OriginalMetricMths;
 import MTHS.metrics.PSRMetric;
@@ -167,6 +168,12 @@ public class AlgorithmRoutes {
 
 				// Cálculo para a rota atual
 				CTR = metric.calculate(route, coeffMetric);
+			} else if (metricType.equals(MetricMethodType.MSCL_SPECTRUM)){
+				MSCLSpectrum metric = MSCLSpectrum.getMSCLSpectrumInstance();
+
+				route.setSlotsByMSCL(null);
+				// Cálculo para a rota atual
+				CTR = metric.calculate(route, callRequest);
 			}
 
 			// Cria a solução fuzzy para a rota

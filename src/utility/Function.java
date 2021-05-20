@@ -145,7 +145,7 @@ public class Function { // NOPMD by Andr� on 12/06/17 14:47
    	 * @param callRequest
    	 * @author Andr� 			
    	 */	
-	public int calculateNumberOfSlots(final ModulationLevelType modLevelType, final CallRequest callRequest){
+	public int calculateNumberOfSlots(final ModulationLevelType modLevelType, final int bitRate){
 		
 		final double bZero = SimulationParameters.getSpacing();
 		int requNumbOfSlots = 0; // NOPMD by Andr� on 07/06/17 15:31
@@ -153,10 +153,10 @@ public class Function { // NOPMD by Andr� on 12/06/17 14:47
 		final double constelationLog2 = Math.log10(modLevelType.getConstelation())/Math.log10(2);
 		final double temp = (constelationLog2*bZero)/1E9;		
 		
-		if(callRequest.getBitRate()%temp==0){
-			requNumbOfSlots = (int) (callRequest.getBitRate()/temp);					
+		if(bitRate%temp==0){
+			requNumbOfSlots = (int) (bitRate/temp);					
 		}else{
-			requNumbOfSlots = (int) (callRequest.getBitRate()/temp); // NOPMD by Andr� on 07/06/17 15:31
+			requNumbOfSlots = (int) (bitRate/temp); // NOPMD by Andr� on 07/06/17 15:31
 			requNumbOfSlots++;
 		}
 		
